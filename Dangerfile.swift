@@ -14,9 +14,9 @@ let sourceChanges = allSourceFiles.contains { $0.hasPrefix("Sources") }
 let isNotTrivial = !danger.github.pullRequest.title.contains("#trivial")
 if isNotTrivial && noChangelogEntry && sourceChanges {
     danger.warn("""
-         Any changes to library code should be reflected in the Changelog.
-         Please consider adding a note there and adhere to the [Changelog Guidelines](https://github.com/Moya/contributors/blob/master/Changelog%20Guidelines.md).
-        """)
+     Any changes to library code should be reflected in the Changelog.
+     Please consider adding a note there and adhere to the [Changelog Guidelines](https://github.com/Moya/contributors/blob/master/Changelog%20Guidelines.md).
+    """)
 }
 
 // Make it more obvious that a PR is a work in progress and shouldn't be merged yet
@@ -53,30 +53,32 @@ if danger.utils.exec("grep -r \"fit Demo/Tests/\"").count > 1 {
 let addedSwiftLibraryFiles = danger.git.createdFiles.contains { $0.fileType == .swift && $0.hasPrefix("Sources") }
 let deletedSwiftLibraryFiles = danger.git.deletedFiles.contains { $0.fileType == .swift && $0.hasPrefix("Sources") }
 let modifiedCarthageXcodeProject = danger.git.modifiedFiles.contains { $0.contains("Moya.xcodeproj") }
-if (addedSwiftLibraryFiles || deletedSwiftLibraryFiles) && !modifiedCarthageXcodeProject {
+if addedSwiftLibraryFiles || deletedSwiftLibraryFiles, !modifiedCarthageXcodeProject {
     fail("Added or removed library files require the Carthage Xcode project to be updated. See the Readme")
 }
 
 let missingDocChanges = !danger.git.modifiedFiles.contains { $0.contains("docs") }
 let docChangeRecommended = (danger.github.pullRequest.additions ?? 0) > 15
-if sourceChanges && missingDocChanges && docChangeRecommended && isNotTrivial {
+if sourceChanges, missingDocChanges, docChangeRecommended, isNotTrivial {
     warn("Consider adding supporting documentation to this change. Documentation can be found in the `docs` directory.")
 }
 
 // Run danger-prose to lint Chinese docs
 let addedAndModifiedCnDocsMarkdown = allSourceFiles.filter { $0.fileType == .markdown && $0.contains("docs_CN") }
 if #available(OSX 10.12, *),
-    !addedAndModifiedCnDocsMarkdown.isEmpty {
+   !addedAndModifiedCnDocsMarkdown.isEmpty
+{
     Proselint.performSpellCheck(files: addedAndModifiedCnDocsMarkdown, excludedRules: ["misc.scare_quotes", "typography.symbols"])
 }
 
 // Run danger-prose to lint and check spelling English docs
 let addedAndModifiedEnDocsMarkdown = allSourceFiles.filter { $0.fileType == .markdown && $0.contains("docs/") }
 if #available(OSX 10.12, *),
-    !addedAndModifiedEnDocsMarkdown.isEmpty {
+   !addedAndModifiedEnDocsMarkdown.isEmpty
+{
     Proselint.performSpellCheck(files: addedAndModifiedEnDocsMarkdown)
 
-    let ignoredWords = ["Auth", "auth", "Moya", "enum", "enums", "OAuth", "Artsy's", "Heimdallr.swift", "SwiftyJSONMapper", "ObjectMapper", "Argo", "ModelMapper", "ReactiveSwift", "RxSwift", "multipart", "JSONEncoder", "Alamofire", "CocoaPods", "URLSession", "plugin", "plugins", "stubClosure", "requestClosure", "endpointClosure", "Unsplash", "ReactorKit", "Dribbble", "EVReflection", "Unbox"]
+    let ignoredWords = ["Auth", "auth", "Moya", "enum", "enums", "OAuth", "Artsy's", "Heimdallr.swift", "SwiftyJSONMapper", "ObjectMapper", "Argo", "ModelMapper", "multipart", "JSONEncoder", "Alamofire", "CocoaPods", "URLSession", "plugin", "plugins", "stubClosure", "requestClosure", "endpointClosure", "Unsplash", "ReactorKit", "Dribbble", "EVReflection", "Unbox"]
     Mdspell.performSpellCheck(files: addedAndModifiedEnDocsMarkdown, ignoredWords: ignoredWords, language: "en-us")
 }
 
@@ -89,7 +91,7 @@ let manifests = [
     "Package.resolved"
 ]
 let updatedManifests = manifests.filter { manifest in danger.git.modifiedFiles.contains { $0.name == manifest } }
-if !updatedManifests.isEmpty && updatedManifests.count != manifests.count {
+if !updatedManifests.isEmpty, updatedManifests.count != manifests.count {
     let notUpdatedManifests = manifests.filter { !updatedManifests.contains($0) }
     let updatedArticle = updatedManifests.count == 1 ? "The " : ""
     let updatedVerb = updatedManifests.count == 1 ? "was" : "were"
@@ -102,7 +104,7 @@ if !updatedManifests.isEmpty && updatedManifests.count != manifests.count {
 
 // Warn when library files has been updated but not tests.
 let testsUpdated = danger.git.modifiedFiles.contains { $0.hasPrefix("Tests") }
-if sourceChanges && !testsUpdated {
+if sourceChanges, !testsUpdated {
     warn("The library files were changed, but the tests remained unmodified. Consider updating or adding to the tests to match the library changes.")
 }
 
@@ -113,18 +115,21 @@ SwiftLint.lint(inline: true, configFile: ".swiftlint.yml")
 func filePathForPlatform(_ platform: String) -> String {
     return "xcodebuild-\(platform).json"
 }
+
 func labelTestSummary(label: String, platform: String) throws {
     let file = filePathForPlatform(platform)
     let json = danger.utils.readFile(file)
 
     guard let data = json.data(using: .utf8),
-        var jsonDictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] else {
+          var jsonDictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+    else {
         throw CocoaError(.fileReadCorruptFile)
     }
 
     jsonDictionary["tests_summary_messages"] = (jsonDictionary["tests_summary_messages"] as? [String])?.map { label + ": " + $0 }
     try String(data: JSONSerialization.data(withJSONObject: jsonDictionary, options: []), encoding: .utf8)?.write(toFile: file, atomically: false, encoding: .utf8)
 }
+
 func summary(platform: String) {
     XCodeSummary(filePath: filePathForPlatform(platform)).report()
 }
