@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/mattgallagher/CwlCatchException.git",
         "state": {
           "branch": null,
-          "revision": "682841464136f8c66e04afe5dbd01ab51a3a56f2",
-          "version": "2.1.0"
+          "revision": "35f9e770f54ce62dd8526470f14c6e137cef3eea",
+          "version": "2.1.1"
         }
       },
       {
@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/shibapm/PackageConfig.git",
         "state": {
           "branch": null,
-          "revision": "fd0829aac9851434b3d2db0890e27bc489fc973a",
-          "version": "0.12.2"
+          "revision": "bf90dc69fa0792894b08a0b74cf34029694ae486",
+          "version": "0.13.0"
         }
       },
       {
@@ -74,30 +74,12 @@
         }
       },
       {
-        "package": "ReactiveSwift",
-        "repositoryURL": "https://github.com/ReactiveCocoa/ReactiveSwift.git",
-        "state": {
-          "branch": null,
-          "revision": "2c06e9421011a1a4cf57ea4bbcd8936843a6c9da",
-          "version": "6.6.1"
-        }
-      },
-      {
         "package": "Rocket",
         "repositoryURL": "https://github.com/shibapm/Rocket",
         "state": {
           "branch": null,
           "revision": "51a77ce5fa66c42715c14dcc542c01cd7a60fb27",
           "version": "1.2.0"
-        }
-      },
-      {
-        "package": "RxSwift",
-        "repositoryURL": "https://github.com/ReactiveX/RxSwift.git",
-        "state": {
-          "branch": null,
-          "revision": "7c17a6ccca06b5c107cfa4284e634562ddaf5951",
-          "version": "6.2.0"
         }
       },
       {
