@@ -2,7 +2,6 @@ import Foundation
 
 /// Represents an HTTP task.
 public enum Task {
-
     /// A request with no additional data.
     case requestPlain
 
@@ -35,6 +34,9 @@ public enum Task {
 
     /// A file download task to a destination.
     case downloadDestination(DownloadDestination)
+
+    /// A file download task with resume data, to a destination
+    case downloadResume(resumeData: Data, destination: DownloadDestination)
 
     /// A file download task to a destination with extra parameters using the given encoding.
     case downloadParameters(parameters: [String: Any], encoding: ParameterEncoding, destination: DownloadDestination)
